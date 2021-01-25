@@ -37,14 +37,14 @@ IMZML_TEMPLATE = """\
 
   <referenceableParamGroupList count="4">
     <referenceableParamGroup id="mzArray">
-      <cvParam cvRef="MS" accession="MS:@obo_codes[mz_compression]" name="@mz_compression" value=""/>
       <cvParam cvRef="MS" accession="MS:1000514" name="m/z array" unitCvRef="MS" unitAccession="MS:1000040" unitName="m/z"/>
+      <cvParam cvRef="MS" accession="MS:@obo_codes[mz_compression]" name="@mz_compression" value=""/>
       <cvParam cvRef="MS" accession="MS:@obo_codes[mz_data_type]" name="@mz_data_type" value=""/>
       <cvParam cvRef="IMS" accession="IMS:1000101" name="external data" value="true"/>
     </referenceableParamGroup>
     <referenceableParamGroup id="intensityArray">
-      <cvParam cvRef="MS" accession="MS:@obo_codes[int_data_type]" name="@int_data_type" value=""/>
       <cvParam cvRef="MS" accession="MS:1000515" name="intensity array" unitCvRef="MS" unitAccession="MS:1000131" unitName="number of detector counts"/>
+      <cvParam cvRef="MS" accession="MS:@obo_codes[int_data_type]" name="@int_data_type" value=""/>
       <cvParam cvRef="MS" accession="MS:@obo_codes[int_compression]" name="@int_compression" value=""/>
       <cvParam cvRef="IMS" accession="IMS:1000101" name="external data" value="true"/>
     </referenceableParamGroup>
@@ -82,6 +82,8 @@ IMZML_TEMPLATE = """\
       <cvParam cvRef="IMS" accession="IMS:@obo_codes[line_scan_direction]" name="@obo_names[line_scan_direction]"/>
       <cvParam cvRef="IMS" accession="IMS:1000042" name="max count of pixels x" value="@{(max(s.coords[0] for s in spectra))!!s}"/>
       <cvParam cvRef="IMS" accession="IMS:1000043" name="max count of pixels y" value="@{(max(s.coords[1] for s in spectra))!!s}"/>
+      <cvParam cvRef="IMS" accession="IMS:1000046" name="pixel size x" value="@pixel_size_x" unitCvRef="UO" unitAccession="UO:0000017" unitName="micrometer"/>
+      <cvParam cvRef="IMS" accession="IMS:1000047" name="pixel size y" value="@pixel_size_x" unitCvRef="UO" unitAccession="UO:0000017" unitName="micrometer"/>
     </scanSettings>
   </scanSettingsList>
 
@@ -101,7 +103,7 @@ IMZML_TEMPLATE = """\
   <run defaultInstrumentConfigurationRef="IC1" id="@run_id">
     <spectrumList count="@{len(spectra)!!s}" defaultDataProcessingRef="export_from_pyimzml">
       @for index, s in enumerate(spectra):
-      <spectrum defaultArrayLength="0" id="spectrum=@{(index+1)!!s}" index="@{(index+1)!!s}">
+      <spectrum defaultArrayLength="0" id="spectrum=@{(index+1*startAtZero)!!s}" index="@{(index+1*startAtZero)!!s}">
         <referenceableParamGroupRef ref="spectrum1"/>
         <cvParam cvRef="MS" accession="MS:1000528" name="lowest observed m/z" value="@{s.mz_min!!s}" unitCvRef="MS" unitAccession="MS:1000040" unitName="m/z"/>
         <cvParam cvRef="MS" accession="MS:1000527" name="highest observed m/z" value="@{s.mz_max!!s}" unitCvRef="MS" unitAccession="MS:1000040" unitName="m/z"/>
@@ -185,9 +187,11 @@ class ImzMLWriter(object):
                  mz_dtype=np.float64, intensity_dtype=np.float32, mode="auto", spec_type="centroid",
                  scan_direction="top_down", line_scan_direction="line_left_right", scan_pattern="one_way", scan_type="horizontal_line", 
                  mz_compression=NoCompression(), intensity_compression=NoCompression(),
-                 polarity=None):
+                 polarity=None, pixel_size_x=100, pixel_size_y=100):
 
         self.mz_dtype = mz_dtype
+        self.pixel_size_x = pixel_size_x
+        self.pixel_size_y = pixel_size_y
         self.intensity_dtype = intensity_dtype
         self.mode = mode
         self.spec_type = spec_type
@@ -236,6 +240,8 @@ class ImzMLWriter(object):
         spectra = self.spectra
         mz_data_type = self._np_type_to_name(self.mz_dtype)
         int_data_type = self._np_type_to_name(self.intensity_dtype)
+        pixel_size_x = self.pixel_size_x
+        pixel_size_y = self.pixel_size_y
         obo_codes = {"32-bit integer": "1000519", 
                      "16-bit float": "1000520",
                      "32-bit float": "1000521",
