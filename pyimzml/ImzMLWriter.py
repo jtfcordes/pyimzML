@@ -103,7 +103,7 @@ IMZML_TEMPLATE = """\
   <run defaultInstrumentConfigurationRef="IC1" id="@run_id">
     <spectrumList count="@{len(spectra)!!s}" defaultDataProcessingRef="export_from_pyimzml">
       @for index, s in enumerate(spectra):
-      <spectrum defaultArrayLength="0" id="spectrum=@{(index+1*start_zero)!!s}" index="@{(index+1*start_zero)!!s}">
+      <spectrum defaultArrayLength="0" id="spectrum=@{(index+1*start_index)!!s}" index="@{(index+1*start_index)!!s}">
         <referenceableParamGroupRef ref="spectrum1"/>
         <cvParam cvRef="MS" accession="MS:1000528" name="lowest observed m/z" value="@{s.mz_min!!s}" unitCvRef="MS" unitAccession="MS:1000040" unitName="m/z"/>
         <cvParam cvRef="MS" accession="MS:1000527" name="highest observed m/z" value="@{s.mz_max!!s}" unitCvRef="MS" unitAccession="MS:1000040" unitName="m/z"/>
@@ -187,12 +187,12 @@ class ImzMLWriter(object):
                  mz_dtype=np.float64, intensity_dtype=np.float32, mode="auto", spec_type="centroid",
                  scan_direction="top_down", line_scan_direction="line_left_right", scan_pattern="one_way", scan_type="horizontal_line", 
                  mz_compression=NoCompression(), intensity_compression=NoCompression(),
-                 polarity=None, pixel_size_x=100, pixel_size_y=100, start_zero=1):
+                 polarity=None, pixel_size_x=100, pixel_size_y=100, start_index=1):
 
         self.mz_dtype = mz_dtype
         self.pixel_size_x = pixel_size_x
         self.pixel_size_y = pixel_size_y
-        self.start_zero = start_zero
+        self.start_index = start_index
         self.intensity_dtype = intensity_dtype
         self.mode = mode
         self.spec_type = spec_type
@@ -243,7 +243,7 @@ class ImzMLWriter(object):
         int_data_type = self._np_type_to_name(self.intensity_dtype)
         pixel_size_x = self.pixel_size_x
         pixel_size_y = self.pixel_size_y
-        start_zero = self.start_zero
+        start_index = self.start_index
         obo_codes = {"32-bit integer": "1000519", 
                      "16-bit float": "1000520",
                      "32-bit float": "1000521",
