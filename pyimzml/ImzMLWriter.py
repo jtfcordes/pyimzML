@@ -82,8 +82,8 @@ IMZML_TEMPLATE = """\
       <cvParam cvRef="IMS" accession="IMS:@obo_codes[line_scan_direction]" name="@obo_names[line_scan_direction]"/>
       <cvParam cvRef="IMS" accession="IMS:1000042" name="max count of pixels x" value="@{(max(s.coords[0] for s in spectra))!!s}"/>
       <cvParam cvRef="IMS" accession="IMS:1000043" name="max count of pixels y" value="@{(max(s.coords[1] for s in spectra))!!s}"/>
-      <cvParam cvRef="IMS" accession="IMS:1000046" name="pixel size x" value="@pixel_size_x" unitCvRef="UO" unitAccession="UO:0000017" unitName="micrometer"/>
-      <cvParam cvRef="IMS" accession="IMS:1000047" name="pixel size y" value="@pixel_size_y" unitCvRef="UO" unitAccession="UO:0000017" unitName="micrometer"/>
+      <cvParam cvRef="IMS" accession="IMS:1000046" name="pixel size x" value="@{pixel_size_x!!s}" unitCvRef="UO" unitAccession="UO:0000017" unitName="micrometer"/>
+      <cvParam cvRef="IMS" accession="IMS:1000047" name="pixel size y" value="@{pixel_size_y!!s}" unitCvRef="UO" unitAccession="UO:0000017" unitName="micrometer"/>
     </scanSettings>
   </scanSettingsList>
 
